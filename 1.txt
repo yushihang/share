@@ -1,0 +1,113 @@
+interview
+
+I’m good at identifying knowledge gaps and rapidly accquiring the necessary knowledge.
+
+I also prefer to view source code, whether it’s ours or from a third party, to find the root cause.
+
+
+
+完美主义
+
+I tend to be a perfectionist, which can sometimes slow me down. But I’m learning to balance quality with efficiency.
+
+In my personal work, sometimes I get caught up in minute details. Like, when coding, I’d spend lots of time perfecting a small function.
+
+But now, I set time limits for each task. If I can’t reach my prefect target within that time. I move on, leave todo comments, then come back later.
+
+In people management,  I tend to overly involved in every team member's task before.
+
+Now, I set clear goals and expectations, then trust my team to execute. I check in at key milestones to ensure quality, but I don't micromanage, which saves time and boosts efficiency.
+
+Letting the team do their thing on their own helps them get better at their jobs and feel more confident. It also shows them that I trust them.
+
+Additionally, I summarize and observe, identifying the strengths in my team members' work. Then, I encourage them to share these with each other, which helps build a learning-oriented team."
+
+
+
+项目管理
+最重要的是方向
+
+"We should ensure that the team's target direction aligns with the direction of each individual team member's efforts." 
+"Okay, so in a team, everyone's gotta know where we're going. It's like in math with the dot product. When people's work directions match the team goal (small angle), we get the most done. But if they're way off (big angle), we don't get as much done or it can even be bad.
+
+次重要的
+
+Next up, communication's super important. Team members gotta be able to talk, share ideas, say what's bothering them, and know what everyone else is doing. Keeps things running smooth."
+
+
+第三重要
+Make sure each team member is in the right position for their skills and give them clear goals and tasks. 
+
+
+第四重要
+ Regularly check on their work at minor milestones and reward them for their achievements.
+
+
+第五重要
+"Fifth, encourage continuous learning among team members to build a learning-oriented team." 
+
+
+第六重要
+Put people in groups of two or three to do tasks. They can talk about it, know what each other's doing, and see how it's going. If someone's away, the rest can smoothly pick up their work so things keep going."
+
+
+
+When conflicts arise, encourage open and fair discussions. Those raising issues should also present solutions. Use data and results to check if the solutions work. If most are satisfied, accept it."
+
+
+
+First, talk to understand his view.
+Then, show him teamwork's value.
+Divide work into small tasks.
+Let him work on a small module like user management.
+This way, it won't affect main user journey.
+He can apply his plan and new design.
+After he finishes restructuring, test it.
+Evaluate if it supports architecture, is easy to learn,
+And if test data meets expectations.
+If it all works, other team members can accept and follow.
+
+
+
+
+
+
+
+如果遇到难做的工作
+I'd start by clearly communicating the importance of the deadline and the goals. Then, I'd break the work into manageable chunks and set small rewards for achieving each milestone. Also, I'd make sure to recognize and appreciate everyone's efforts during this challenging time.
+
+
+Well, I'd communicate openly with the team about the overtime. (Leaning back, folding his hands in thought) Maybe offer flexible hours or some form of compensation or recognition for their extra efforts. 
+
+
+
+如果有人失去了水准
+ I'd first have a private chat to see if there's a personal issue. Then, set clear goals and offer support or training if needed. How about you?
+
+Maybe set up a performance improvement plan with specific time-bound goals. If he still can't meet the mark, perhaps it's time to reevaluate his role in the team. What do you think?
+
+如果需要做出tough decision
+
+Absolutely! When faced with a tough decision that impacts the team, I believe in complete transparency. I'd call  the team together and explain the situation clearly, leaving no room for misunderstandings.
+I'd emphasize that this decision isn't made lightly and isn't anyone's fault within the team. If it's about financial constraints leading to salary cuts or layoffs, I'd share the company's financial situation in a way they can understand.
+And most importantly, I'd outline the steps we're taking to improve the situation. Whether it's exploring new projects, restructuring, or seeking additional funding. This way, the team knows we're all in this together, and they can trust that I'm doing everything possible to support them."
+
+
+如果项目需求变更
+
+Yes, in our line of work, it's common to encounter situations where requirements change. Occasionally, it can be quite a challenge, but I've learned to adapt quickly.  when I faced a major change in project scope, first, I analyzed the new requirements thoroughly.
+ Then I communicated with the team to ensure everyone understood the changes.
+ I adjusted our plans and timelines accordingly and made sure to monitor progress closely.
+
+
+学习的方法
+There are two main approaches to learning.
+One is systematic learning, which helps build a solid foundation.
+The other is problem-driven learning — identifying knowledge gaps while solving problems, then learning with a clear and immediate goal in mind.
+
+I believe the two approaches should complement each other. Systematic learning builds long-term depth and breadth, while problem-driven learning tends to be more efficient in a focused area due to its clear purpose.
+
+发布能力
+
+I have extensive hands-on experience in IT engineering practices, excelling at establishing processes and continually refining them based on encountered issues to ensure product release quality. I also possess a keen ability to leverage experience in promptly identifying potential red flags and detail-oriented problems.
+

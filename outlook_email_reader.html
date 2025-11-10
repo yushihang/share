@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Outlook Email Reader</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 30px;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .drop-zone {
+        background: white;
+        border: 3px dashed #cbd5e0;
+        border-radius: 12px;
+        padding: 60px 40px;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        margin-bottom: 30px;
+      }
+
+      .drop-zone.drag-over {
+        border-color: #667eea;
+        background: #f7fafc;
+        transform: scale(1.02);
+      }
+
+      .drop-zone-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+      }
+
+      .drop-zone h2 {
+        color: #2d3748;
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+      }
+
+      .drop-zone p {
+        color: #718096;
+        font-size: 1rem;
+      }
+
+      .email-content {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        display: none;
+      }
+
+      .email-content.show {
+        display: block;
+        animation: slideIn 0.3s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .email-header {
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+      }
+
+      .email-subject {
+        font-size: 1.8rem;
+        color: #2d3748;
+        margin-bottom: 15px;
+        font-weight: 600;
+      }
+
+      .email-meta {
+        display: grid;
+        gap: 10px;
+      }
+
+      .email-meta-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .email-meta-label {
+        font-weight: 600;
+        color: #4a5568;
+        min-width: 80px;
+      }
+
+      .email-meta-value {
+        color: #718096;
+        flex: 1;
+      }
+
+      .email-body {
+        background: #f7fafc;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+        line-height: 1.6;
+        color: #2d3748;
+        max-height: 500px;
+        overflow-y: auto;
+      }
+
+      .email-body-label {
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+      }
+
+      .attachments {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px solid #e2e8f0;
+      }
+
+      .attachments-label {
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+      }
+
+      .attachment-item {
+        background: #edf2f7;
+        padding: 10px 15px;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .attachment-icon {
+        font-size: 1.2rem;
+      }
+
+      .clear-btn {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: background 0.3s ease;
+      }
+
+      .clear-btn:hover {
+        background: #5568d3;
+      }
+
+      .error-message {
+        background: #fed7d7;
+        color: #c53030;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: none;
+      }
+
+      .error-message.show {
+        display: block;
+      }
+
+      .file-input {
+        display: none;
+      }
+
+      .browse-btn {
+        color: #667eea;
+        text-decoration: underline;
+        cursor: pointer;
+        font-weight: 500;
+      }
+
+      .loading {
+        display: none;
+        text-align: center;
+        padding: 20px;
+      }
+
+      .loading.show {
+        display: block;
+      }
+
+      .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #667eea;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 10px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>📧 Outlook Email Reader</h1>
+        <p>
+          Drag emails directly from Outlook or select email files (.eml/.msg)
+        </p>
+      </div>
+
+      <div class="error-message" id="errorMessage"></div>
+
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-zone-icon">📬</div>
+        <h2>Drop emails here</h2>
+        <p>
+          Drag an email from Outlook here, or drag/select .eml/.msg files |
+          <span
+            class="browse-btn"
+            onclick="document.getElementById('fileInput').click()"
+            >Browse files</span
+          >
+        </p>
+        <input
+          type="file"
+          id="fileInput"
+          class="file-input"
+          accept=".eml,.msg"
+          multiple
+        />
+      </div>
+
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Parsing email...</p>
+      </div>
+
+      <div class="email-content" id="emailContent">
+        <div class="email-header">
+          <div class="email-subject" id="emailSubject"></div>
+          <div class="email-meta">
+            <div class="email-meta-item">
+              <span class="email-meta-label">From:</span>
+              <span class="email-meta-value" id="emailFrom"></span>
+            </div>
+            <div class="email-meta-item">
+              <span class="email-meta-label">To:</span>
+              <span class="email-meta-value" id="emailTo"></span>
+            </div>
+            <div class="email-meta-item">
+              <span class="email-meta-label">Cc:</span>
+              <span class="email-meta-value" id="emailCc"></span>
+            </div>
+            <div class="email-meta-item">
+              <span class="email-meta-label">Date:</span>
+              <span class="email-meta-value" id="emailDate"></span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="email-body-label">Email Body:</div>
+          <div class="email-body" id="emailBody"></div>
+        </div>
+
+        <div class="attachments" id="attachmentsSection" style="display: none">
+          <div class="attachments-label">Attachments:</div>
+          <div id="attachmentsList"></div>
+        </div>
+
+        <button class="clear-btn" onclick="clearEmail()">
+          Clear and Read New Email
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const dropZone = document.getElementById("dropZone");
+      const fileInput = document.getElementById("fileInput");
+      const emailContent = document.getElementById("emailContent");
+      const loading = document.getElementById("loading");
+      const errorMessage = document.getElementById("errorMessage");
+
+      // Prevent default drag behaviors
+      ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+      });
+
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      // Highlight drop zone when item is dragged over it
+      ["dragenter", "dragover"].forEach((eventName) => {
+        dropZone.addEventListener(
+          eventName,
+          () => {
+            dropZone.classList.add("drag-over");
+          },
+          false
+        );
+      });
+
+      ["dragleave", "drop"].forEach((eventName) => {
+        dropZone.addEventListener(
+          eventName,
+          () => {
+            dropZone.classList.remove("drag-over");
+          },
+          false
+        );
+      });
+
+      // Handle dropped files
+      dropZone.addEventListener("drop", handleDrop, false);
+      fileInput.addEventListener("change", handleFileSelect, false);
+
+      function handleDrop(e) {
+        const dt = e.dataTransfer;
+
+        // Check if there are files (dragged from file system)
+        if (dt.files && dt.files.length > 0) {
+          handleFiles(dt.files);
+          return;
+        }
+
+        // Check if there's text/html content (dragged from Outlook)
+        const htmlContent = dt.getData("text/html");
+        if (htmlContent) {
+          parseOutlookDraggedEmail(dt, htmlContent);
+          return;
+        }
+
+        // Check if there's plain text
+        const textContent = dt.getData("text/plain");
+        if (textContent) {
+          parseOutlookDraggedEmail(dt, null, textContent);
+          return;
+        }
+
+        showError(
+          "Unable to read the dragged content. Please try dragging the email again or save it as .eml file first."
+        );
+      }
+
+      function handleFileSelect(e) {
+        const files = e.target.files;
+        handleFiles(files);
+      }
+
+      function handleFiles(files) {
+        if (files.length === 0) return;
+
+        // Take the first file
+        const file = files[0];
+
+        // Check file type
+        const fileName = file.name.toLowerCase();
+        if (!fileName.endsWith(".eml") && !fileName.endsWith(".msg")) {
+          showError("Please select an email file in .eml or .msg format");
+          return;
+        }
+
+        parseEmailFile(file);
+      }
+
+      function parseEmailFile(file) {
+        hideError();
+        loading.classList.add("show");
+        emailContent.classList.remove("show");
+
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          const content = e.target.result;
+
+          if (file.name.toLowerCase().endsWith(".eml")) {
+            parseEMLFile(content);
+          } else if (file.name.toLowerCase().endsWith(".msg")) {
+            parseMSGFile(content, file);
+          }
+
+          loading.classList.remove("show");
+        };
+
+        reader.onerror = function () {
+          loading.classList.remove("show");
+          showError("Failed to read file, please try again");
+        };
+
+        reader.readAsText(file);
+      }
+
+      function parseEMLFile(content) {
+        try {
+          const email = {
+            subject: "",
+            from: "",
+            to: "",
+            cc: "",
+            date: "",
+            body: "",
+            attachments: [],
+          };
+
+          // Parse email headers and body
+          const lines = content.split("\n");
+          let inHeader = true;
+          let currentHeader = "";
+          let bodyStarted = false;
+          let bodyLines = [];
+          let isBase64Body = false;
+          let contentType = "";
+
+          for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+
+            if (inHeader) {
+              // Check for end of headers
+              if (line.trim() === "") {
+                inHeader = false;
+                bodyStarted = true;
+                continue;
+              }
+
+              // Parse headers
+              if (line.match(/^[A-Za-z-]+:/)) {
+                const colonIndex = line.indexOf(":");
+                currentHeader = line.substring(0, colonIndex).trim();
+                const value = line.substring(colonIndex + 1).trim();
+
+                switch (currentHeader.toLowerCase()) {
+                  case "subject":
+                    email.subject = decodeHeader(value);
+                    break;
+                  case "from":
+                    email.from = decodeHeader(value);
+                    break;
+                  case "to":
+                    email.to = decodeHeader(value);
+                    break;
+                  case "cc":
+                    email.cc = decodeHeader(value);
+                    break;
+                  case "date":
+                    email.date = value;
+                    break;
+                  case "content-type":
+                    contentType = value.toLowerCase();
+                    break;
+                  case "content-transfer-encoding":
+                    if (value.toLowerCase().includes("base64")) {
+                      isBase64Body = true;
+                    }
+                    break;
+                }
+              } else if (line.match(/^\s/) && currentHeader) {
+                // Continuation of previous header
+                const value = line.trim();
+                switch (currentHeader.toLowerCase()) {
+                  case "subject":
+                    email.subject += " " + decodeHeader(value);
+                    break;
+                  case "from":
+                    email.from += " " + decodeHeader(value);
+                    break;
+                  case "to":
+                    email.to += " " + decodeHeader(value);
+                    break;
+                  case "cc":
+                    email.cc += " " + decodeHeader(value);
+                    break;
+                }
+              }
+            } else if (bodyStarted) {
+              // Collect body lines
+              bodyLines.push(line);
+            }
+          }
+
+          // Process body
+          if (isBase64Body) {
+            try {
+              email.body = atob(bodyLines.join("").replace(/\s/g, ""));
+            } catch (e) {
+              email.body = bodyLines.join("\n");
+            }
+          } else {
+            email.body = bodyLines.join("\n");
+          }
+
+          // Clean up body
+          email.body = cleanEmailBody(email.body);
+
+          displayEmail(email);
+        } catch (error) {
+          console.error("Parse error:", error);
+          showError("Failed to parse email: " + error.message);
+        }
+      }
+
+      function parseMSGFile(content, file) {
+        // MSG format is binary and complex, requires special parsing
+        // For now, we'll show basic file info and suggest using .eml format
+        showError(
+          ".msg format is complex, please use .eml format instead. You can save the email as .eml format in Outlook.\n\nTip: In Outlook, open the email → File → Save As → Select .eml format"
+        );
+      }
+
+      function parseOutlookDraggedEmail(
+        dataTransfer,
+        htmlContent,
+        textContent
+      ) {
+        hideError();
+        loading.classList.add("show");
+        emailContent.classList.remove("show");
+
+        try {
+          const email = {
+            subject: "",
+            from: "",
+            to: "",
+            cc: "",
+            date: "",
+            body: "",
+            attachments: [],
+          };
+
+          // Try to extract information from HTML content
+          if (htmlContent) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlContent, "text/html");
+
+            // Extract email body
+            email.body = doc.body.innerText || doc.body.textContent || "";
+
+            // Try to find meta information in the HTML
+            // Outlook sometimes includes email headers in the HTML
+            const allText = doc.body.innerHTML;
+
+            // Try to extract subject
+            const subjectMatch = allText.match(/Subject:\s*([^\n<]+)/i);
+            if (subjectMatch) {
+              email.subject = subjectMatch[1].trim();
+            }
+
+            // Try to extract from
+            const fromMatch = allText.match(/From:\s*([^\n<]+)/i);
+            if (fromMatch) {
+              email.from = fromMatch[1].trim();
+            }
+
+            // Try to extract to
+            const toMatch = allText.match(/To:\s*([^\n<]+)/i);
+            if (toMatch) {
+              email.to = toMatch[1].trim();
+            }
+
+            // Try to extract date
+            const dateMatch = allText.match(/(?:Date|Sent):\s*([^\n<]+)/i);
+            if (dateMatch) {
+              email.date = dateMatch[1].trim();
+            }
+
+            // Try to extract cc
+            const ccMatch = allText.match(/Cc:\s*([^\n<]+)/i);
+            if (ccMatch) {
+              email.cc = ccMatch[1].trim();
+            }
+          } else if (textContent) {
+            // Parse plain text content
+            const lines = textContent.split("\n");
+            let bodyStartIndex = 0;
+
+            // Try to find headers in plain text
+            for (let i = 0; i < Math.min(lines.length, 20); i++) {
+              const line = lines[i].trim();
+
+              if (line.match(/^Subject:\s*/i)) {
+                email.subject = line.replace(/^Subject:\s*/i, "").trim();
+                bodyStartIndex = Math.max(bodyStartIndex, i + 1);
+              } else if (line.match(/^From:\s*/i)) {
+                email.from = line.replace(/^From:\s*/i, "").trim();
+                bodyStartIndex = Math.max(bodyStartIndex, i + 1);
+              } else if (line.match(/^To:\s*/i)) {
+                email.to = line.replace(/^To:\s*/i, "").trim();
+                bodyStartIndex = Math.max(bodyStartIndex, i + 1);
+              } else if (line.match(/^Cc:\s*/i)) {
+                email.cc = line.replace(/^Cc:\s*/i, "").trim();
+                bodyStartIndex = Math.max(bodyStartIndex, i + 1);
+              } else if (line.match(/^(?:Date|Sent):\s*/i)) {
+                email.date = line.replace(/^(?:Date|Sent):\s*/i, "").trim();
+                bodyStartIndex = Math.max(bodyStartIndex, i + 1);
+              }
+            }
+
+            // Extract body (skip header lines)
+            email.body = lines.slice(bodyStartIndex).join("\n").trim();
+          }
+
+          // Check if we have any file data that might have been included
+          if (dataTransfer.items) {
+            for (let i = 0; i < dataTransfer.items.length; i++) {
+              const item = dataTransfer.items[i];
+              if (item.kind === "file") {
+                const file = item.getAsFile();
+                if (file) {
+                  email.attachments.push({
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                  });
+                }
+              }
+            }
+          }
+
+          loading.classList.remove("show");
+          displayEmail(email);
+        } catch (error) {
+          console.error("Parse error:", error);
+          loading.classList.remove("show");
+          showError("Failed to parse dragged email: " + error.message);
+        }
+      }
+
+      function decodeHeader(value) {
+        // Decode RFC 2047 encoded headers like =?UTF-8?B?...?=
+        const regex = /=\?([^?]+)\?([BQ])\?([^?]+)\?=/gi;
+        return value.replace(regex, (match, charset, encoding, encoded) => {
+          try {
+            if (encoding.toUpperCase() === "B") {
+              return atob(encoded);
+            } else if (encoding.toUpperCase() === "Q") {
+              return decodeQuotedPrintable(encoded);
+            }
+          } catch (e) {
+            return match;
+          }
+          return match;
+        });
+      }
+
+      function decodeQuotedPrintable(str) {
+        return str
+          .replace(/_/g, " ")
+          .replace(/=([0-9A-F]{2})/gi, (match, hex) => {
+            return String.fromCharCode(parseInt(hex, 16));
+          });
+      }
+
+      function cleanEmailBody(body) {
+        // Remove common email artifacts
+        body = body.replace(/=\r?\n/g, ""); // Remove soft line breaks
+        body = body.replace(/=([0-9A-F]{2})/gi, (match, hex) => {
+          return String.fromCharCode(parseInt(hex, 16));
+        });
+        return body.trim();
+      }
+
+      function displayEmail(email) {
+        document.getElementById("emailSubject").textContent =
+          email.subject || "(No Subject)";
+        document.getElementById("emailFrom").textContent =
+          email.from || "(Unknown)";
+        document.getElementById("emailTo").textContent =
+          email.to || "(Unknown)";
+        document.getElementById("emailCc").textContent = email.cc || "(None)";
+        document.getElementById("emailDate").textContent =
+          email.date || "(Unknown)";
+
+        // Display body with preserved formatting
+        const bodyElement = document.getElementById("emailBody");
+        bodyElement.textContent = email.body || "(Email body is empty)";
+
+        // Display attachments if any
+        if (email.attachments && email.attachments.length > 0) {
+          const attachmentsSection =
+            document.getElementById("attachmentsSection");
+          const attachmentsList = document.getElementById("attachmentsList");
+          attachmentsList.innerHTML = "";
+
+          email.attachments.forEach((att) => {
+            const attDiv = document.createElement("div");
+            attDiv.className = "attachment-item";
+            attDiv.innerHTML = `
+                        <span class="attachment-icon">📎</span>
+                        <span>${att.name} (${formatBytes(att.size)})</span>
+                    `;
+            attachmentsList.appendChild(attDiv);
+          });
+
+          attachmentsSection.style.display = "block";
+        } else {
+          document.getElementById("attachmentsSection").style.display = "none";
+        }
+
+        emailContent.classList.add("show");
+      }
+
+      function formatBytes(bytes) {
+        if (bytes === 0) return "0 Bytes";
+        const k = 1024;
+        const sizes = ["Bytes", "KB", "MB", "GB"];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return (
+          Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i]
+        );
+      }
+
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.classList.add("show");
+      }
+
+      function hideError() {
+        errorMessage.classList.remove("show");
+      }
+
+      function clearEmail() {
+        emailContent.classList.remove("show");
+        fileInput.value = "";
+        hideError();
+      }
+    </script>
+  </body>
+</html>
